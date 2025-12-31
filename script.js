@@ -1,177 +1,194 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- DOM Elements ---
+    // --- SETUP & STATE ---
+    const state = {
+        name: "Friend"
+    };
+
     const ui = {
-        pets: document.querySelectorAll('.pet-watcher'),
+        body: document.body,
         scenes: {
-            intro: document.getElementById('scene-intro'),
-            cake: document.getElementById('scene-cake'),
-            blast: document.getElementById('scene-blast'),
-            wish: document.getElementById('scene-wish')
+            past: document.getElementById('scene-past'),
+            future: document.getElementById('scene-future')
         },
-        btnStart: document.getElementById('btn-start'),
-        cakeContainer: document.getElementById('cake-interaction'),
-        cakeBody: document.querySelector('.cake-body'),
-        fireCanvas: document.getElementById('firework-canvas'),
-        yearText: document.getElementById('year-text'),
-        btnRestart: document.getElementById('btn-restart')
+        elements: {
+            burdenGrid: document.getElementById('burden-grid'),
+            taskBox: document.querySelector('.release-task'),
+            inputName: document.getElementById('inp-real-name'),
+            btnRelease: document.getElementById('btn-final-release')
+        },
+        letter: {
+            paper: document.getElementById('letter-paper-el'),
+            text: document.getElementById('letter-text')
+        }
     };
 
-    // --- STATE ---
-    let state = {
-        cakeCut: false
-    };
-
-    // --- MOUSE TRACKING (Pets) ---
-    document.addEventListener('mousemove', (e) => {
-        ui.pets.forEach(pet => {
-            const eyes = pet.querySelectorAll('.pet-eye');
-            eyes.forEach(eye => {
-                const pupil = eye.querySelector('.pet-pupil');
-                const rect = eye.getBoundingClientRect();
-                const eyeCenterX = rect.left + rect.width / 2;
-                const eyeCenterY = rect.top + rect.height / 2;
-
-                // Angle to pointer
-                const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-
-                // Limit movement distance (keep inside eye)
-                const distance = Math.min(3, 3); // 3px radius
-
-                const x = Math.cos(angle) * distance;
-                const y = Math.sin(angle) * distance;
-
-                pupil.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-            });
-        });
+    // --- TASK: SIGN & RELEASE ---
+    ui.elements.btnRelease.addEventListener('click', handleRelease);
+    // Allow 'Enter' key
+    ui.elements.inputName.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleRelease();
     });
 
-    // --- SCENE NAV ---
-    function switchScene(name) {
-        Object.values(ui.scenes).forEach(s => {
-            s.classList.remove('active');
-            setTimeout(() => { if (!s.classList.contains('active')) s.style.display = 'none'; }, 1000);
-        });
+    function handleRelease() {
+        // Validation: Allow simple names, trim
+        const val = ui.elements.inputName.value.trim();
 
-        const next = ui.scenes[name];
-        next.style.display = 'flex';
-        void next.offsetWidth;
-        next.classList.add('active');
+        if (val.length > 0) {
+            state.name = val;
+
+            // 1. UI: Disable input to prevent double clicks
+            ui.elements.inputName.disabled = true;
+            ui.elements.btnRelease.style.transform = "scale(0.95)";
+
+            // 2. Animate Heaviness Away
+            ui.elements.burdenGrid.classList.add('fly-away-words');
+            ui.elements.taskBox.style.opacity = '0';
+            ui.elements.taskBox.style.transform = 'translateY(20px)';
+            ui.elements.taskBox.style.transition = 'all 1s ease';
+
+            // 3. Audio & Vibe
+            playReleaseSound();
+
+            setTimeout(() => {
+                ui.body.classList.add('sunrise-vibe');
+                spawnMarigoldShower();
+            }, 800);
+
+            // 4. Transition to Wish
+            setTimeout(() => {
+                ui.scenes.past.classList.remove('active');
+                ui.scenes.future.classList.add('active');
+
+                ui.letter.paper.classList.add('letter-enter');
+                // Start typing shortly after paper appears
+                setTimeout(typeWriterParams, 1000);
+            }, 1200);
+
+        } else {
+            // Visual Shake for Empty Input
+            ui.elements.inputName.focus();
+            ui.elements.inputName.style.borderBottom = "2px solid #FF5252";
+            setTimeout(() => ui.elements.inputName.style.borderBottom = "2px solid #FFF", 500);
+        }
     }
 
-    // Scene 1 -> 2
-    ui.btnStart.addEventListener('click', () => {
-        switchScene('cake');
-    });
 
-    // --- SCENE 2: CAKE CUTTING ---
-    // Simple drag detection
-    let isDragging = false;
-    ui.cakeContainer.addEventListener('mousedown', () => isDragging = true);
-    ui.cakeContainer.addEventListener('touchstart', () => isDragging = true);
+    // --- TYPEWRITER WISH (Emotional & Friendly) ---
+    function typeWriterParams() {
+        const lines = [
+            `Namaskaram ${state.name}! ✨`,
+            `You just released the heavy past. Super asalu!`,
+            `2025 lo enno chusam... Silent ga barincham.`,
+            `But ninnu nuvvu nammukunnav (You believed in yourself).`,
+            `Anduke you are here... Stronger than ever! 💪`,
+            `2026 is Yours. "Thaggedhe Le" attitude tho vellu.`,
+            `Be Real. Be Happy. Nuvvu Keka anthe!`,
+            `Have a Crazy New Year! ❤️`,
+            `- Shiva`
+        ];
 
-    ['mouseup', 'touchend'].forEach(evt =>
-        document.addEventListener(evt, () => {
-            if (isDragging && !state.cakeCut) {
-                cutCake();
-            }
-            isDragging = false;
-        })
-    );
+        let line = 0;
+        let char = 0;
+        ui.letter.text.innerHTML = "";
 
-    function cutCake() {
-        state.cakeCut = true;
-        ui.cakeBody.classList.add('cut');
+        // Auto-scroll logic for mobile if text gets long
+        const paper = ui.letter.paper;
 
-        // Wait for animation then go to blast
-        setTimeout(() => {
-            switchScene('blast');
-            startFireworks();
-        }, 2000);
-    }
-
-    // --- SCENE 3: FIREWORKS ---
-    function startFireworks() {
-        const ctx = ui.fireCanvas.getContext('2d');
-        let width, height;
-
-        function resize() {
-            width = ui.fireCanvas.width = window.innerWidth;
-            height = ui.fireCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        let particles = [];
-
-        function Particle(x, y, color) {
-            this.x = x; this.y = y;
-            this.color = color;
-            this.velocity = { x: (Math.random() - 0.5) * 8, y: (Math.random() - 0.5) * 8 };
-            this.alpha = 1;
-            this.friction = 0.95;
-            this.gravity = 0.05;
-        }
-
-        Particle.prototype.draw = function () {
-            ctx.globalAlpha = this.alpha;
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-            ctx.fill();
-        };
-
-        Particle.prototype.update = function () {
-            this.velocity.x *= this.friction;
-            this.velocity.y *= this.friction;
-            this.velocity.y += this.gravity;
-            this.x += this.velocity.x;
-            this.y += this.velocity.y;
-            this.alpha -= 0.01;
-        };
-
-        function explode(x, y) {
-            const colors = ['#FF00FF', '#FFD700', '#00FFFF', '#FF5722'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            for (let i = 0; i < 50; i++) {
-                particles.push(new Particle(x, y, color));
-            }
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            ctx.fillStyle = 'rgba(18, 10, 42, 0.2)'; // Trail effect
-            ctx.fillRect(0, 0, width, height);
-
-            particles.forEach((p, i) => {
-                if (p.alpha > 0) {
-                    p.update();
-                    p.draw();
-                } else {
-                    particles.splice(i, 1);
+        function type() {
+            if (line < lines.length) {
+                if (char === 0) {
+                    const p = document.createElement('p');
+                    ui.letter.text.appendChild(p);
                 }
-            });
+                const str = lines[line];
+                const p = ui.letter.text.lastElementChild;
+                p.innerHTML += str[char];
+                char++;
 
-            // Random auto explosions
-            if (Math.random() < 0.05) {
-                explode(Math.random() * width, Math.random() * height * 0.5);
+                // Ensure visibility on mobile
+                // paper.scrollTop = paper.scrollHeight; 
+
+                if (char >= str.length) {
+                    line++; char = 0;
+                    setTimeout(type, 600);
+                } else {
+                    setTimeout(type, 40);
+                }
             }
         }
-
-        animate();
-
-        // Reveal Year Text
-        setTimeout(() => { ui.yearText.style.opacity = 1; }, 500);
-
-        // Move to Wish after 5 seconds
-        setTimeout(() => {
-            switchScene('wish');
-        }, 5000);
+        type();
     }
 
-    // --- RESET ---
-    ui.btnRestart.addEventListener('click', () => {
-        location.reload();
-    });
 
+    // --- CANVAS & FX ---
+    let canvas, ctx;
+    let petals = [];
+
+    // Init Canvas
+    function initCanvas() {
+        canvas = document.getElementById('particles');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    initCanvas();
+
+    function spawnMarigoldShower() {
+        // Create 100 petals
+        petals = Array.from({ length: 100 }).map(() => ({
+            x: Math.random() * canvas.width,
+            y: -Math.random() * 500,
+            vy: Math.random() * 3 + 2,
+            size: 5 + Math.random() * 5,
+            color: ['#FF6F00', '#FFD600', '#D50000'][Math.floor(Math.random() * 3)],
+            angle: Math.random() * 360,
+            spin: (Math.random() - 0.5) * 5
+        }));
+        requestAnimationFrame(loop);
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let active = false;
+        petals.forEach(p => {
+            p.y += p.vy;
+            p.x += Math.sin(p.y * 0.02);
+            p.angle += p.spin;
+
+            if (p.y < canvas.height + 20) {
+                active = true;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        });
+
+        if (active) requestAnimationFrame(loop);
+    }
+
+    // --- AUDIO SIMULATION ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playReleaseSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+        g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    }
 });
