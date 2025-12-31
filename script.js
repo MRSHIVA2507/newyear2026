@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- SUPABASE SETUP ---
+    const supabaseUrl = 'https://vqavggllvxbwtxayxmba.supabase.co';
+    const supabaseKey = 'sb_publishable_FwsUWkzv1iB0gULuYnNojA_wlak-h9O'; // User Provided Key
+    let supabase;
+
+    try {
+        // @ts-ignore
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        console.log("Supabase initialized");
+    } catch (e) {
+        console.error("Supabase Init Error:", e);
+    }
+
     // --- SETUP & STATE ---
     const state = {
         name: "Friend"
@@ -36,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (val.length > 0) {
             state.name = val;
+
+            // 0. Save to Cloud
+            saveVisitor(state.name);
 
             // 1. UI: Disable input to prevent double clicks
             ui.elements.inputName.disabled = true;
@@ -191,4 +207,95 @@ document.addEventListener('DOMContentLoaded', () => {
         g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
         osc.start(); osc.stop(audioCtx.currentTime + 0.5);
     }
+    // --- DATA & ADMIN ---
+    async function saveVisitor(name) {
+        if (!supabase) return;
+        const { error } = await supabase
+            .from('visitors')
+            .insert({ name: name });
+
+        if (error) console.error("Error saving name:", error);
+    }
+
+    // Admin UI References
+    const adminTrigger = document.getElementById('admin-trigger-zone');
+    const adminModal = document.getElementById('admin-modal');
+    const closeAdmin = document.getElementById('close-admin');
+    const adminPassInput = document.getElementById('admin-pass');
+    const btnAdminLogin = document.getElementById('btn-admin-login');
+    const visitorList = document.getElementById('visitor-list');
+
+    // 1. Open Modal (Secret Trigger)
+    let triggerCount = 0;
+    adminTrigger.addEventListener('click', () => {
+        triggerCount++;
+        if (triggerCount >= 5) { // Tap 5 times to open
+            adminModal.classList.remove('hidden');
+            triggerCount = 0;
+        }
+    });
+
+    // 2. Close Modal
+    closeAdmin.addEventListener('click', () => adminModal.classList.add('hidden'));
+
+    // 3. Login & Fetch
+    btnAdminLogin.addEventListener('click', () => {
+        const pin = adminPassInput.value;
+        if (pin === "2026") { // SIMPLE PIN (Change if needed)
+            loadVisitors();
+            document.getElementById('login-section').style.display = 'none';
+            visitorList.classList.remove('hidden');
+        } else {
+            alert("Wrong PIN!");
+        }
+    });
+
+    async function loadVisitors() {
+        if (!supabase) {
+            visitorList.innerHTML = "<p>Supabase not configured.</p>";
+            return;
+        }
+        visitorList.innerHTML = "<p>Loading...</p>";
+
+        const { data, error } = await supabase
+            .from('visitors')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        if (error) {
+            console.error("Error getting documents: ", error);
+            visitorList.innerHTML = "<p>Error loading list.</p>";
+            return;
+        }
+
+        visitorList.innerHTML = "";
+        if (!data || data.length === 0) {
+            visitorList.innerHTML = "<p>No visitors yet.</p>";
+            return;
+        }
+
+        data.forEach((row) => {
+            const date = row.created_at ? new Date(row.created_at) : new Date();
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const el = document.createElement('div');
+            el.className = 'visitor-item';
+            el.innerHTML = `
+                <span class="v-name"><b>${escapeHtml(row.name)}</b></span>
+                <span class="v-time">${timeStr}</span>
+            `;
+            visitorList.appendChild(el);
+        });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return text;
+        return text.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
 });

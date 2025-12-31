@@ -275,3 +275,84 @@ body.sunrise-vibe {
         padding: 16px 0;
     }
 }
+
+/* --- ADMIN PANEL --- */
+.hidden {
+    display: none !important;
+}
+
+.admin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.admin-content {
+    background: #263238;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #FFF;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.admin-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-header h2 {
+    font-size: 1.2rem;
+    color: #FFD700;
+    margin: 0;
+}
+
+#close-admin {
+    background: transparent;
+    border: none;
+    color: #FFF;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.admin-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.visitor-list {
+    margin-top: 10px;
+}
+
+.visitor-item {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.visitor-item:last-child {
+    border-bottom: none;
+}
+
+.v-time {
+    font-size: 0.75rem;
+    color: #90A4AE;
+}

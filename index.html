@@ -61,6 +61,37 @@
 
     </div>
 
+    <!-- SUPABASE SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <!-- ADMIN TRIGGER -->
+    <div id="admin-trigger-zone"
+        style="position: fixed; bottom: 0; right: 0; width: 40px; height: 40px; opacity: 0.01; cursor: default; z-index: 1000;"
+        title="?"></div>
+
+    <!-- ADMIN MODAL -->
+    <div id="admin-modal" class="admin-modal hidden">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2>Visitor Log</h2>
+                <button id="close-admin">×</button>
+            </div>
+            <div class="admin-body">
+                <div id="login-section" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                    <input type="password" id="admin-pass" placeholder="Admin PIN"
+                        style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;">
+                    <button id="btn-admin-login"
+                        style="padding: 8px 16px; background: #FF6F00; color: white; border: none; border-radius: 8px; cursor: pointer;">Go</button>
+                </div>
+
+                <div id="visitor-list" class="visitor-list hidden"
+                    style="text-align: left; max-height: 300px; overflow-y: auto;">
+                    <!-- List Items -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
