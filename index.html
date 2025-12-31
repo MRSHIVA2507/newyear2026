@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>New Year Celebration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- GLOBAL: WATCHING PETS (Overlay) -->
+        <div class="pets-overlay">
+            <!-- Top Left Pet -->
+            <div class="pet-watcher" id="pet-1" style="top: 20px; left: 20px;">
+                <div class="pet-head">
+                    <div class="pet-ears left"></div>
+                    <div class="pet-ears right"></div>
+                    <div class="pet-eye">
+                        <div class="pet-pupil"></div>
+                    </div>
+                    <div class="pet-eye">
+                        <div class="pet-pupil"></div>
+                    </div>
+                    <div class="pet-snout"></div>
+                </div>
+            </div>
+
+            <!-- Bottom Right Pet -->
+            <div class="pet-watcher" id="pet-2" style="bottom: 20px; right: 20px;">
+                <div class="pet-head bear">
+                    <div class="pet-ears left"></div>
+                    <div class="pet-ears right"></div>
+                    <div class="pet-eye">
+                        <div class="pet-pupil"></div>
+                    </div>
+                    <div class="pet-eye">
+                        <div class="pet-pupil"></div>
+                    </div>
+                    <div class="pet-mouth"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SCENE 1: THE INTRO (Emotional Check-in) -->
+        <section id="scene-intro" class="scene active">
+            <div class="content -center">
+                <h1 class="glow-text title-large">Are you ready?</h1>
+                <p class="subtitle fade-in delay-1">The clock is ticking...</p>
+                <p class="subtitle fade-in delay-2">Leave the sadness here.</p>
+                <p class="subtitle fade-in delay-3">Take the hope forward.</p>
+
+                <button id="btn-start" class="btn-shine fade-in delay-4">Let's Celebrate ✂️</button>
+            </div>
+        </section>
+
+
+        <!-- SCENE 2: CAKE CUTTING -->
+        <section id="scene-cake" class="scene">
+            <div class="content -center">
+                <h2 class="scene-title">Make a sweet beginning!</h2>
+                <p class="instruction">Swipe across the cake to cut it.</p>
+
+                <div class="cake-container" id="cake-interaction">
+                    <div class="cake-body">
+                        <div class="cake-layer bottom"></div>
+                        <div class="cake-layer middle"></div>
+                        <div class="cake-layer top"></div>
+                        <div class="cake-frosting"></div>
+                        <div class="candles">
+                            <div class="candle c1">
+                                <div class="flame"></div>
+                            </div>
+                            <div class="candle c2">
+                                <div class="flame"></div>
+                            </div>
+                            <div class="candle c3">
+                                <div class="flame"></div>
+                            </div>
+                        </div>
+                        <!-- We will animate a "cut" line here via JS -->
+                        <div id="knife-cut" class="cut-line"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SCENE 3: FIREWORKS (Blast) -->
+        <section id="scene-blast" class="scene">
+            <canvas id="firework-canvas"></canvas>
+            <div class="blast-text">
+                <h1 id="year-text">2026</h1>
+                <p>BOOM! 💥</p>
+            </div>
+        </section>
+
+
+        <!-- SCENE 4: EMOTIONAL WISH (Finale) -->
+        <section id="scene-wish" class="scene">
+            <div class="content -center -scrollable-y">
+
+                <div class="greeting-card">
+                    <div class="card-emoji">💖</div>
+                    <h2 class="wish-header">Happy New Year!</h2>
+
+                    <div class="emotional-message">
+                        <p>Dude... Listen to me.</p>
+                        <p>Life wasn't fair last year, I know.</p>
+                        <p>We struggled. We cried in secret. We fell down.</p>
+                        <p><strong>But look at us now.</strong> We are standing.</p>
+                        <br>
+                        <p>This year is different. </p>
+                        <p>No more fearing the future.</p>
+                        <p>We are going to rock it. 🚀</p>
+                        <p>Smile purely. Work hard. Love deeply.</p>
+                        <p>The time is yours!</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <p>From the bottom of my heart,</p>
+                        <p>Have a blasting year!</p>
+                    </div>
+                </div>
+
+                <div class="creator-badge">
+                    <p>Created with ❤️ by <strong>SHIVA</strong></p>
+                </div>
+
+                <button id="btn-restart" class="btn-simple">Replay Journey ↺</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
